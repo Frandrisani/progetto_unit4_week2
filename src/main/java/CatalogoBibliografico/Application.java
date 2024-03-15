@@ -6,12 +6,17 @@ import CatalogoBibliografico.entities.Riviste;
 import CatalogoBibliografico.interfaces.Catalogo;
 import com.github.javafaker.Faker;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import org.apache.commons.io.FileUtils;
 
 public class Application {
 
@@ -209,9 +214,28 @@ public class Application {
                     // ----- Ricerca per autore -----
                 case 5:
                     System.out.println("Hai selezionato l'opzione 5. Ricerca per autore");
-                    System.out.println("Inserisci l'anno di pubblicazione: ");
-
+                    System.out.println("Inserisci il nime dell'autore: ");
+                    String autore = scanner.nextLine();
+                    try{
+                        elementi.stream().filter(i -> {if (i instanceof Book) {
+                            return ((Book) i).getAutore().equals(autore);
+                        }else return false;
+                                })
+                    .forEach(System.out::println);
+                    }catch (Exception e){
+                        System.out.println("Il nome inserito non risulta all'interno dei nostri database. Ci dispiace. Riprova.");
+                    };
                     break;
+                    case 6:
+                        System.out.println("Hai selezionato l'opzione 6. Salvataggio su disco dell'archivio");;
+                        try{
+                            File file = new File("src/catalogo.txt");
+                            FileUtils.writeStringToFile(file, elementi.stream().map() + System.lineSeparator(), StandardCharsets.UTF_8, true);
+                            System.out.println("Scritto!");
+                        }catch (IOException e){
+                            System.err.println(e.getMessage());
+                        }
+                        break;
             }
         }while (!continuo);
     }
