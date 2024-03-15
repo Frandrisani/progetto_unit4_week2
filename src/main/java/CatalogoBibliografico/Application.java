@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.*;
 
@@ -26,7 +25,7 @@ public class Application {
         Book b1 = new Book(123456789, faker.programmingLanguage().name(), LocalDate.of(2019, 1, 1), 206, "Luca x", faker.book().genre());
         Book b2 = new Book(987654321, faker.programmingLanguage().name(), LocalDate.of(2023, 4, 25), 95, "Giacomo y", faker.book().genre());
         Book b3 = new Book(134679852, faker.programmingLanguage().name(), LocalDate.of(2023, 8, 16), 347, "Lidia z", faker.book().genre());
-        Book b4 = new Book(976431852, faker.programmingLanguage().name(), LocalDate.of(2005, 9, 19), 194, "Giacomo  y", faker.book().genre());
+        Book b4 = new Book(976431852, faker.programmingLanguage().name(), LocalDate.of(2021, 9, 19), 194, "Giacomo  y", faker.book().genre());
         Book b5 = new Book(197346825, faker.programmingLanguage().name(), LocalDate.of(2021, 2, 6), 83, "Luca x", faker.book().genre());
         // ----- 5 riviste -----
         Riviste r1 = new Riviste(112233445, faker.company().name(), LocalDate.of(2017, 6, 4), 25, Periodicita.MENSILE);
@@ -111,7 +110,108 @@ public class Application {
                     System.out.println("Inserisci il codice ISBN del libro da rimuovere: ");
                     long isbn = Long.parseLong(scanner.nextLine());
 
+                    // Cerca l'elemento con il codice ISBN inserito
+                    // Cosa faccio qui? Creo uno stream dalla lista elementi e filtro gli elementi che hanno il codice ISBN corrispondente
+                    Catalogo elementiDaRimuovere = elementi.stream()
+                            .filter(i -> {
+                               // Con instanceof verifico se l'elemento è di tipo Book o Riviste
+                                if (i instanceof Book) {
+                                    // Con getISBN() recupero il codice ISBN dell'elemento
+                                    return ((Book) i).getISBN() == isbn;
+                                } else if (i instanceof Riviste) {
+                                    return ((Riviste) i).getISBN() == isbn;
+                                }
+                                return false;
+                            })
+                            // Con findFirst() cerco l'elemento che ha il codice ISBN inserito, il primo che trova
+                            .findFirst()
+                            // Con una ricerca veb noto che con orElse si può specificare un valore di default nel caso in cui non trovi l'elemento, in questo caso
+                            .orElse(null);
+
+                    // Se l'elemento è stato trovato, lo mostri e lo rimuovi dalla lista
+                    //iniziamo con un if per verificare se l'elemento è diverso da null
+                    if (elementiDaRimuovere != null) {
+                        //se lo è lo mostriamo, avendo sempre cura di verificare si si tratta di un libro o di una rivista
+                        System.out.println("Elemento trovato:");
+                        if (elementiDaRimuovere instanceof Book) {
+                            System.out.println(((Book) elementiDaRimuovere).toString());
+                        } else if (elementiDaRimuovere instanceof Riviste) {
+                            System.out.println(((Riviste) elementiDaRimuovere).toString());
+                        }
+                        //Una volta mostrato all'utente quale sarà l'elemento da rimuovere, con removeIf si rimuove l'elemento dalla lista
+                        elementi.removeIf(i -> {
+                            if (i instanceof Book) {
+                                return ((Book) i).getISBN() == isbn;
+                            } else if (i instanceof Riviste) {
+                                return ((Riviste) i).getISBN() == isbn;
+                            }
+                            return false;
+                        });
+
+                        System.out.println("Elemento rimosso con successo.");
+                        elementi.forEach(System.out::println);
+                    } else {
+                        System.err.println("Nessun elemento trovato con il codice ISBN specificato.");
+                    }
+                    break;
+                    // ----- Ricerca elemento tramite codice ISBN -----
+                case 3:
+                    System.out.println("Hai selezionato l'opzione 3. Ricerca elemento tramite codice ISBN");
+                    System.out.println("Inserisci il codice ISBN del libro da cercare: ");
+                    long isbn2 = Long.parseLong(scanner.nextLine());
+                    // Cerca l'elemento con il codice ISBN inserito
+                    // Creo uno stream dalla lista elementi e filtro gli elementi che hanno il codice ISBN corrispondente
+                    try {
+                        Catalogo elementiDaCercareTramiteISBN = elementi.stream().filter(i -> {
+                                    // Con instanceof verifico se l'elemento è di tipo Book o Riviste
+                                    if (i instanceof Book) {
+                                        // Con getISBN() recupero il codice ISBN dell'elemento
+                                        return ((Book) i).getISBN() == isbn2;
+                                    } else if (i instanceof Riviste) {
+                                        return ((Riviste) i).getISBN() == isbn2;
+                                    }
+                                    return false;
+                                })
+                                .findFirst()
+                                .orElse(null);
+                        System.out.println("Elemento trovato:");
+                        if (elementiDaCercareTramiteISBN instanceof Book) {
+                        System.out.println(((Book) elementiDaCercareTramiteISBN).toString());
+                    } else if (elementiDaCercareTramiteISBN instanceof Riviste) {
+                    System.out.println(((Riviste) elementiDaCercareTramiteISBN).toString());
+                }
+
+                    }catch (Exception e){
+                        System.err.println ("Nessun elemento trovato con il codice ISBN specificato.");
+            }
+
                 break;
+                // ----- Ricerca elemento per anno di pubblicazione-----
+                case 4:
+                    System.out.println("Hai selezionato l'opzione 4. Ricerca elementi per anno di pubblicazione");
+                    System.out.println("Inserisci l'anno di pubblicazione: ");
+                    int annoPubblicazione2 = Integer.parseInt(scanner.nextLine());
+                    // Cerca l'elemento con l'anno di pubblicazione inserito
+                    // Creo uno stream dalla lista elementi e filtro gli elementi che hanno l'anno di pubblicazione corrispondente
+                    try{
+                        elementi.stream().filter(i -> {
+                            if (i instanceof Book) {
+                            return ((Book) i).getAnnoPubblicazione().getYear() == annoPubblicazione2;
+                        } else if (i instanceof Riviste) {
+                            return ((Riviste) i).getAnnoPubblicazione().getYear() == annoPubblicazione2;
+                        }
+                        return false;
+                    }).forEach(System.out::println);
+            }catch(Exception e){
+                System.err.println("Nessun elemento trovato con l'anno di pubblicazione specificato.");
+                    }
+                    break;
+                    // ----- Ricerca per autore -----
+                case 5:
+                    System.out.println("Hai selezionato l'opzione 5. Ricerca per autore");
+                    System.out.println("Inserisci l'anno di pubblicazione: ");
+
+                    break;
             }
         }while (!continuo);
     }
