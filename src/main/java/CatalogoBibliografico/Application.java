@@ -223,19 +223,30 @@ public class Application {
                                 })
                     .forEach(System.out::println);
                     }catch (Exception e){
-                        System.out.println("Il nome inserito non risulta all'interno dei nostri database. Ci dispiace. Riprova.");
+                        System.err.println("Il nome inserito non risulta all'interno dei nostri database. Ci dispiace. Riprova.");
                     };
                     break;
                     case 6:
                         System.out.println("Hai selezionato l'opzione 6. Salvataggio su disco dell'archivio");;
                         try{
                             File file = new File("src/catalogo.txt");
-                            FileUtils.writeStringToFile(file, elementi.stream().map() + System.lineSeparator(), StandardCharsets.UTF_8, true);
+                            FileUtils.writeStringToFile(file, elementi.stream().toString() + System.lineSeparator(), StandardCharsets.UTF_8, true);
                             System.out.println("Scritto!");
                         }catch (IOException e){
                             System.err.println(e.getMessage());
                         }
                         break;
+                case 7:
+                    System.out.println("Hai selezionato l'opzione 7. Lettura da disco dell'archivio");
+                    try {
+                        File file = new File("src/catalogo.txt");
+                        String contenuto = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+                        System.out.println("Contenuto del file:");
+                        System.out.println(contenuto);
+                    } catch (IOException e) {
+                        System.err.println(e.getMessage());
+                    }
+                    break;
             }
         }while (!continuo);
     }
